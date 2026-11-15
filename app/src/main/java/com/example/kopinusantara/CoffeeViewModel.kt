@@ -49,7 +49,7 @@ class CoffeeViewModel : ViewModel() {
     fun login(user: String, pass: String): String? {
         if (user.isBlank() || pass.isBlank()) return "Username dan password tidak boleh kosong"
         if (user.trim() != "admin" || pass != "123456")
-            return "Username atau kata sandi salah. Silakan periksa kembali kredensial Anda."
+            return "Kata sandi salah, silakan memasukkan ulang kata sandi" n
         isLoggedIn = true
         username = user.trim()
         return null

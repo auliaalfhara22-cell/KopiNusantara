@@ -3,16 +3,16 @@ package com.example.kopinusantara
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.kopinusantara.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCoffeeScreen(vm: CoffeeViewModel, onDone: () -> Unit) {
     // rememberSaveable: isi form tidak hilang saat layar diputar
@@ -28,18 +28,12 @@ fun AddCoffeeScreen(vm: CoffeeViewModel, onDone: () -> Unit) {
     var flavorError by rememberSaveable { mutableStateOf<String?>(null) }
     var formError by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Tambah Kopi") },
-                navigationIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    val chipColors = FilterChipDefaults.filterChipColors(
+        selectedContainerColor = CoffeeBrown,
+        selectedLabelColor = Color.White
+    )
+
+    Scaffold(topBar = { CoffeeTopBar("Tambah Kopi", onDone) }) { padding ->
         Column(
             Modifier.padding(padding).padding(16.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -51,33 +45,50 @@ fun AddCoffeeScreen(vm: CoffeeViewModel, onDone: () -> Unit) {
                 isError = nameError != null,
                 supportingText = { nameError?.let { Text(it) } },
                 singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                colors = coffeeFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Text("Daerah asal *", style = MaterialTheme.typography.titleSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
                 ORIGINS.forEach { o ->
                     FilterChip(
                         selected = origin == o,
                         onClick = { origin = o; originError = null },
-                        label = { Text(o) }
+                        label = { Text(o) },
+                        shape = RoundedCornerShape(50),
+                        colors = chipColors
                     )
                 }
             }
-            originError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+            originError?.let {
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
 
             OutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
                 label = { Text("Lokasi kebun (opsional)") },
                 singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                colors = coffeeFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Text("Tingkat sangrai", style = MaterialTheme.typography.titleSmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ROASTS.forEach { r ->
-                    FilterChip(selected = roast == r, onClick = { roast = r }, label = { Text(r) })
+                    FilterChip(
+                        selected = roast == r,
+                        onClick = { roast = r },
+                        label = { Text(r) },
+                        shape = RoundedCornerShape(50),
+                        colors = chipColors
+                    )
                 }
             }
 
@@ -87,6 +98,8 @@ fun AddCoffeeScreen(vm: CoffeeViewModel, onDone: () -> Unit) {
                 label = { Text("Notes rasa (pisahkan dengan koma)") },
                 isError = flavorError != null,
                 supportingText = { Text(flavorError ?: "Contoh: Floral, Rempah, Jeruk") },
+                shape = RoundedCornerShape(16.dp),
+                colors = coffeeFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -95,11 +108,14 @@ fun AddCoffeeScreen(vm: CoffeeViewModel, onDone: () -> Unit) {
                 onValueChange = { tips = it },
                 label = { Text("Tips seduh (opsional)") },
                 minLines = 3,
+                shape = RoundedCornerShape(16.dp),
+                colors = coffeeFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
             if (formError) {
                 Card(
+                    shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
                     ),
@@ -126,8 +142,9 @@ fun AddCoffeeScreen(vm: CoffeeViewModel, onDone: () -> Unit) {
                         onDone()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp)
-            ) { Text("Simpan") }
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().height(54.dp)
+            ) { Text("Simpan", style = MaterialTheme.typography.titleMedium) }
         }
     }
 }
